@@ -19,20 +19,20 @@ int main(int argc, char **argv) {
   std::string sun3d_data_load_dir;
 
   // Fuse first fragment (CAN COMMENT OUT THIS SECTION IF YOU ALREADY FUSED)
-  fuse_frame_start_idx = 600;
-  fuse_frame_end_idx = 650;
-  num_frames_per_frag = 50;
-  frag_saveto_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/";
-  sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
-  generate_data_sun3d(frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx, fuse_frame_end_idx, num_frames_per_frag);
+  // fuse_frame_start_idx = 600;
+  // fuse_frame_end_idx = 650;
+  // num_frames_per_frag = 50;
+  // frag_saveto_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/";
+  // sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
+  // generate_data_sun3d(frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx, fuse_frame_end_idx, num_frames_per_frag);
 
   // Fuse second fragment (CAN COMMENT OUT THIS SECTION IF YOU ALREADY FUSED)
-  fuse_frame_start_idx = 2050;
-  fuse_frame_end_idx = 2100;
-  num_frames_per_frag = 50;
-  frag_saveto_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/";
-  sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
-  generate_data_sun3d(frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx, fuse_frame_end_idx, num_frames_per_frag);
+  // fuse_frame_start_idx = 2050;
+  // fuse_frame_end_idx = 2100;
+  // num_frames_per_frag = 50;
+  // frag_saveto_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/";
+  // sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
+  // generate_data_sun3d(frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx, fuse_frame_end_idx, num_frames_per_frag);
 
   // CHANGE THESE IF YOU NEED TO
   std::string scene1_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/scene600_650";
@@ -196,9 +196,9 @@ int main(int argc, char **argv) {
           fwrite(&float_x, sizeof(float), 1, fp);
           fwrite(&float_y, sizeof(float), 1, fp);
           fwrite(&float_z, sizeof(float), 1, fp);
-          unsigned char r = (unsigned char )255;
-          unsigned char g = (unsigned char )0;
-          unsigned char b = (unsigned char )0;
+          unsigned char r = (unsigned char )248;
+          unsigned char g = (unsigned char )131;
+          unsigned char b = (unsigned char )121;
           fwrite(&r, sizeof(uchar), 1, fp);
           fwrite(&g, sizeof(uchar), 1, fp);
           fwrite(&b, sizeof(uchar), 1, fp);
@@ -234,9 +234,9 @@ int main(int argc, char **argv) {
           fwrite(&trans_x, sizeof(float), 1, fp);
           fwrite(&trans_y, sizeof(float), 1, fp);
           fwrite(&trans_z, sizeof(float), 1, fp);
-          unsigned char r = (unsigned char )0;
-          unsigned char g = (unsigned char )0;
-          unsigned char b = (unsigned char )255;
+          unsigned char r = (unsigned char )64;
+          unsigned char g = (unsigned char )224;
+          unsigned char b = (unsigned char )208;
           fwrite(&r, sizeof(uchar), 1, fp);
           fwrite(&g, sizeof(uchar), 1, fp);
           fwrite(&b, sizeof(uchar), 1, fp);
