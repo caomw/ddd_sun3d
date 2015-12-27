@@ -1,0 +1,96 @@
+{
+	"test":
+		{
+			"GPU": [0],
+			"debug_mode": false
+		},                
+        
+	"layers":[
+		{
+			"type": "MemoryData",
+			"name": "dataTest",
+			"phase": "Testing",
+      "file_data": "TMPdata.tensor",
+      "file_label": "TMPlabels.tensor",
+			"batch_size": 256,
+			"size_crop": [1,1,1],
+			"out": ["data","label"]
+		},    
+		{
+			"in": ["data"],
+			"type": "InnerProduct",
+			"name": "fc1",
+			"num_output": 1024,
+			"weight_lr_mult": 1.0,
+			"weight_filler": "Xavier",
+			"bias_lr_mult": 2.0,
+			"bias_filler": "Constant",
+			"bias_filler_param": 0.0,
+			"out": ["fc1"]
+		},
+		{
+			"in": ["fc1"],
+			"type": "Activation",
+			"name": "relu6",
+			"mode": "ReLU",
+			"out": ["fc1"]
+		}, 
+		{
+			"in": ["fc1"],
+			"type": "InnerProduct",
+			"name": "fc2",
+			"num_output": 512,
+			"weight_lr_mult": 1.0,
+			"weight_filler": "Xavier",
+			"bias_lr_mult": 2.0,
+			"bias_filler": "Constant",
+			"bias_filler_param": 0.0,
+			"out": ["fc2"]
+		},
+		{
+			"in": ["fc2"],
+			"type": "Activation",
+			"name": "relu7",
+			"mode": "ReLU",
+			"out": ["fc2"]
+		}, 
+		{
+			"in": ["fc2"],
+			"type": "InnerProduct",
+			"name": "fc3",
+			"num_output": 128,
+			"weight_lr_mult": 1.0,
+			"weight_filler": "Xavier",
+			"bias_lr_mult": 2.0,
+			"bias_filler": "Constant",
+			"bias_filler_param": 0.0,
+			"out": ["fc3"]
+		},
+		{
+			"in": ["fc3"],
+			"type": "Activation",
+			"name": "relu8",
+			"mode": "ReLU",
+			"out": ["fc3"]
+		}, 
+		{
+			"in": ["fc3"],
+			"type": "InnerProduct",
+			"name": "fc4",
+			"num_output": 2,
+			"weight_lr_mult": 1.0,
+			"weight_filler": "Xavier",
+			"bias_lr_mult": 2.0,
+			"bias_filler": "Constant",
+			"bias_filler_param": 0.0,
+			"out": ["feat"]
+		},	
+		{
+			"in": ["feat"],
+			"type": "Softmax",
+			"stable_gradient": true,
+			"name": "prob",
+			"out": ["prob"]
+		}
+	]
+}
