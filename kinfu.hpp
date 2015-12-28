@@ -1247,9 +1247,9 @@ void find_keypoints(float *range_grid) {
   //   for (int y = range_grid[1*2+0]; y < range_grid[1*2+1]; y++) {
   //     for (int x = range_grid[0*2+0]; x < range_grid[0*2+1]; x++) {
 
-  for (int z = range_grid[2 * 2 + 0] + radius + 1; z < range_grid[2 * 2 + 1] - radius - 1; z++) {
-    for (int y = range_grid[1 * 2 + 0] + radius + 1; y < range_grid[1 * 2 + 1] - radius - 1; y++) {
-      for (int x = range_grid[0 * 2 + 0] + radius + 1; x < range_grid[0 * 2 + 1] - radius - 1; x++) {
+  for (int z = radius + 1; z < 1024 - radius - 1; z++) {
+    for (int y = radius + 1; y < 512 - radius - 1; y++) {
+      for (int x = radius + 1; x < 512 - radius - 1; x++) {
         int volume_idx = z * 512 * 512 + y * 512 + x;
         if (std::abs(voxel_volume.tsdf[volume_idx]) < tsdf_threshold && voxel_volume.weight[volume_idx] > weight_threshold) {
           float covar[9];
@@ -1408,7 +1408,7 @@ void save_volume_to_world_matrix(const std::string &file_name, std::vector<extri
 
 }
 
-void generate_data_sun3d(const std::string &sequence_prefix, const std::string &local_data_dir, int start_idx, int end_idx, int num_frames_per_frag) {
+void generate_data_sun3d(const std::string sequence_name, const std::string &sequence_prefix, const std::string &local_data_dir, int start_idx, int end_idx, int num_frames_per_frag) {
 
   std::vector<std::string> image_list;
   std::vector<std::string> depth_list;
@@ -1417,7 +1417,7 @@ void generate_data_sun3d(const std::string &sequence_prefix, const std::string &
 /////////////////////////////////////////////////////////////////////
 
   // Retrieve local directory
-  std::string sequence_name = "mit_32_d507/d507_2/";
+  //std::string sequence_name = "mit_32_d507/d507_2/";
   passwd* pw = getpwuid(getuid());
   std::string home_dir(pw->pw_dir);
   std::string local_dir = local_data_dir + sequence_name;

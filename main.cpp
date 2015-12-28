@@ -1,42 +1,73 @@
 #include <kinfu.hpp>
+inline bool exists (const std::string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
 
 int main(int argc, char **argv) {
 
 
   // CHANGE THESE IF YOU NEED TO
   bool ddd_verbose = true;
-  const float k_match_score_thresh = 0.1f;
-  const float ransac_k = 50; // RANSAC over top-k > k_match_score_thresh
+  const float k_match_score_thresh = 0.07f;
+  const float ransac_k = 10; // RANSAC over top-k > k_match_score_thresh
   const float max_ransac_iter = 1000000;
-  const float ransac_inlier_thresh = 10.0f; // distance in grid coordinates, default: 4 voxels
+  const float ransac_inlier_thresh = 8.0f; // distance in grid coordinates, default: 4 voxels
 
 
+  std::string sequence_name =  argv[1];
+  int fuse_frame_start_idx_i = atoi(argv[2]);
+  int fuse_frame_start_idx_j = atoi(argv[3]); 
+  int num_frames_per_frag = 50;
+  /*
+  std::string sequence_name = "mit_32_d507/d507_2/";
+  int fuse_frame_start_idx_i = 1330;
+  int fuse_frame_start_idx_j = 3000;//1630 
+  int num_frames_per_frag = 50;
+  */
+  /*
+  std::string sequence_name = "mit_76_studyroom/76-1studyroom2/";
+  int fuse_frame_start_idx_i = 960;
+  int fuse_frame_start_idx_j = 1630;//1630 
+  int num_frames_per_frag = 50;
+  */
+  /*
+  std::string sequence_name = "mit_lab_hj/lab_hj_tea_nov_2_2012_scan1_erika/";
+  int fuse_frame_start_idx_i = 300;
+  int fuse_frame_start_idx_j = 1370;//1630 
+  int num_frames_per_frag = 50;
+  */
 
-  int fuse_frame_start_idx;
-  int fuse_frame_end_idx;
-  int num_frames_per_frag;
+  
   std::string frag_saveto_dir;
   std::string sun3d_data_load_dir;
 
-  // Fuse first fragment (CAN COMMENT OUT THIS SECTION IF YOU ALREADY FUSED)
-  // fuse_frame_start_idx = 600;
-  // fuse_frame_end_idx = 650;
-  // num_frames_per_frag = 50;
-  // frag_saveto_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/";
-  // sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
-  // generate_data_sun3d(frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx, fuse_frame_end_idx, num_frames_per_frag);
+  sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
 
-  // Fuse second fragment (CAN COMMENT OUT THIS SECTION IF YOU ALREADY FUSED)
-  // fuse_frame_start_idx = 2050;
-  // fuse_frame_end_idx = 2100;
-  // num_frames_per_frag = 50;
-  // frag_saveto_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/";
-  // sun3d_data_load_dir = "/data/andyz/kinfu/data/sun3d/";
-  // generate_data_sun3d(frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx, fuse_frame_end_idx, num_frames_per_frag);
+  //Fuse first fragment (CAN COMMENT OUT THIS SECTION IF YOU ALREADY FUSED)
+  frag_saveto_dir = "/data/andyz/kinfu/sun3d/"+sequence_name;
+  int result = system(("mkdir -p "+ frag_saveto_dir).c_str());
+  
+  std::string scene_ply_name = frag_saveto_dir + "scene" +  std::to_string(fuse_frame_start_idx_i) + "_" + std::to_string(fuse_frame_start_idx_i + num_frames_per_frag) + ".ply";
+  if (!exists(scene_ply_name)){
+     generate_data_sun3d(sequence_name, frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx_i, fuse_frame_start_idx_i+num_frames_per_frag, num_frames_per_frag);
+  }
+  else{
+    std::cout<<"file exist, skip fusing: " << scene_ply_name << std::endl;
+  }
+
+  //Fuse second fragment (CAN COMMENT OUT THIS SECTION IF YOU ALREADY FUSED)
+  scene_ply_name = frag_saveto_dir + "scene" +  std::to_string(fuse_frame_start_idx_j) + "_" + std::to_string(fuse_frame_start_idx_j + num_frames_per_frag) + ".ply";
+  if (!exists(scene_ply_name)){
+    generate_data_sun3d(sequence_name, frag_saveto_dir, sun3d_data_load_dir, fuse_frame_start_idx_j,  fuse_frame_start_idx_j+num_frames_per_frag, num_frames_per_frag);
+  }
+  else{
+    std::cout<<"file exist, skip fusing: " << scene_ply_name << std::endl;
+  }
 
   // CHANGE THESE IF YOU NEED TO
-  std::string scene1_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/scene600_650";
-  std::string scene2_dir = "/data/andyz/kinfu/sun3d/mit_32_d507_d507_2/scene2050_2100";
+  std::string scene1_dir = "/data/andyz/kinfu/sun3d/"+ sequence_name + "/scene" + std::to_string(fuse_frame_start_idx_i) + "_" + std::to_string(fuse_frame_start_idx_i + num_frames_per_frag);
+  std::string scene2_dir = "/data/andyz/kinfu/sun3d/"+ sequence_name + "/scene" + std::to_string(fuse_frame_start_idx_j) + "_" + std::to_string(fuse_frame_start_idx_j + num_frames_per_frag);
 
 
 
@@ -170,12 +201,14 @@ int main(int argc, char **argv) {
     std::cout << Rt[i] << std::endl;
 
   // Create point cloud for first tsdf
-  float tsdf_threshold = 0.2f;
+  float tsdf_threshold = 0.03f;
   int num_points = 0;
   for (int i = 0; i < 512*512*1024; i++)
     if (scene_tsdf1[i] < tsdf_threshold)
       num_points++;
-  FILE *fp = fopen("pointcloud1.ply", "w");
+
+  std::string ptsfile = "pointcloud1_"+std::to_string(fuse_frame_start_idx_i) + "_" + std::to_string(fuse_frame_start_idx_i + num_frames_per_frag)+".ply";
+  FILE *fp = fopen(ptsfile.c_str(), "w");
   fprintf(fp, "ply\n");
   fprintf(fp, "format binary_little_endian 1.0\n");
   fprintf(fp, "element vertex %d\n", num_points);
@@ -196,9 +229,9 @@ int main(int argc, char **argv) {
           fwrite(&float_x, sizeof(float), 1, fp);
           fwrite(&float_y, sizeof(float), 1, fp);
           fwrite(&float_z, sizeof(float), 1, fp);
-          unsigned char r = (unsigned char )248;
-          unsigned char g = (unsigned char )131;
-          unsigned char b = (unsigned char )121;
+          unsigned char r = (unsigned char )255;
+          unsigned char g = (unsigned char )0;
+          unsigned char b = (unsigned char )0;
           fwrite(&r, sizeof(uchar), 1, fp);
           fwrite(&g, sizeof(uchar), 1, fp);
           fwrite(&b, sizeof(uchar), 1, fp);
@@ -210,7 +243,10 @@ int main(int argc, char **argv) {
   for (int i = 0; i < 512*512*1024; i++)
     if (scene_tsdf2[i] < tsdf_threshold)
       num_points++;
-  fp = fopen("pointcloud2.ply", "w");
+
+
+  ptsfile = "pointcloud2_"+std::to_string(fuse_frame_start_idx_j) + "_" + std::to_string(fuse_frame_start_idx_j + num_frames_per_frag)+".ply";
+  fp = fopen(ptsfile.c_str(), "w");
   fprintf(fp, "ply\n");
   fprintf(fp, "format binary_little_endian 1.0\n");
   fprintf(fp, "element vertex %d\n", num_points);
@@ -234,9 +270,9 @@ int main(int argc, char **argv) {
           fwrite(&trans_x, sizeof(float), 1, fp);
           fwrite(&trans_y, sizeof(float), 1, fp);
           fwrite(&trans_z, sizeof(float), 1, fp);
-          unsigned char r = (unsigned char )64;
-          unsigned char g = (unsigned char )224;
-          unsigned char b = (unsigned char )208;
+          unsigned char r = (unsigned char )0;
+          unsigned char g = (unsigned char )0;
+          unsigned char b = (unsigned char )255;
           fwrite(&r, sizeof(uchar), 1, fp);
           fwrite(&g, sizeof(uchar), 1, fp);
           fwrite(&b, sizeof(uchar), 1, fp);

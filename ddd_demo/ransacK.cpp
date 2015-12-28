@@ -709,16 +709,15 @@ int ransacfitRt(const std::vector< std::vector<float> > refCoord, const std::vec
     std::vector<int> inlier = TestRigidTransformError(refCoord, movCoord, RankInd, h_RT, thresh2, topK, &h_count);
 
     if (h_count > maxCount) {
-      //printf("ref sample: %d %d %d\n",p1,p2,p3);
-      //printf("corr_sample: %d %d %d\n",corr_sample[0],corr_sample[1],corr_sample[2]);
       maxCount = h_count;
       bestinlier = inlier;
-      if (is_verbose)
-        printf("RANSAC iteration: %d/%d, inliers: %d\n", iter, numLoops, maxCount);
       for (int i = 0; i < 12; i++) {
         rigidtransform[i] = h_RT[i];
       }
 
+      if (is_verbose)
+        printf("RANSAC iteration: %d/%d, inliers: %d\n", iter, numLoops, maxCount);
+      
       // Update estimate of N, the number of trials to ensure we pick,
       // with probability p, a data set with no outliers.
       // float p = 0.9999f;
