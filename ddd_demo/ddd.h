@@ -205,6 +205,23 @@ std::vector<std::vector<float>> ddd_compare_feat(std::vector<std::vector<float>>
   fwrite((void*)&tmp_volume_dim, sizeof(uint32_t), 1, label_tensor_fp);
 
   // Save feature vectors to tensor file
+  // float* total_feats = new float[feat1.size()*feat2.size()*feat_dim*2];
+  // float* total_labels = new float[feat1.size()*feat2.size()];
+  // for (int i = 0; i < feat1.size(); i++) {
+  //   for (int j = 0; j < feat2.size(); j++) {
+  //     if (ddd_verbose)
+  //       std::cout << "Loading keypoint comparison: " << i*feat2.size() + j << "/" << feat1.size() * feat2.size() - 1 << std::endl;
+  //     float* feat1_arr = &feat1[i][0];
+  //     float* feat2_arr = &feat2[j][0];
+  //     // Save feature vector 2
+  //     memcpy(&total_feats[i*feat2.size()*2*feat_dim + j*2*feat_dim + 0*feat_dim], &feat2_arr[j], feat_dim*sizeof(float));
+  //     // Save feature vector 1
+  //     memcpy(&total_feats[i*feat2.size()*2*feat_dim + j*2*feat_dim + 1*feat_dim], &feat1_arr[i], feat_dim*sizeof(float));
+  //     total_labels[i*feat2.size() + j] = 0;
+  //   }
+  // }
+  // fwrite(total_feats, sizeof(float), feat1.size()*feat2.size()*feat_dim*2, data_tensor_fp);
+  // fwrite(total_labels, sizeof(float), feat1.size()*feat2.size(), label_tensor_fp);
   for (int i = 0; i < feat1.size(); i++) {
     for (int j = 0; j < feat2.size(); j++) {
       if (ddd_verbose)

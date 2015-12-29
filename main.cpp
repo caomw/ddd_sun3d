@@ -160,6 +160,10 @@ int main(int argc, char **argv) {
     keypoints1_w.push_back(tmp_keypoint_w);
   }
 
+  // Take absolute value of TSDF volume
+  for (int i = 0; i < 512 * 512 * 1024; i++)
+    scene_tsdf1[i] = std::abs(scene_tsdf1[i]);
+
   // Load second fragment TSDF
   float *scene_tsdf2 = new float[512 * 512 * 1024];
   checkout_tsdf(scene2_dir, scene_tsdf2, 0, 512 - 1, 0, 512 - 1, 0, 1024 - 1);
@@ -181,6 +185,10 @@ int main(int argc, char **argv) {
     tmp_keypoint_w.push_back(keypoints2[i].z);
     keypoints2_w.push_back(tmp_keypoint_w);
   }
+
+  // Take absolute value of TSDF volume
+  for (int i = 0; i < 512 * 512 * 1024; i++)
+    scene_tsdf2[i] = std::abs(scene_tsdf2[i]);
 
   // Compute feature vectors from local keypoint patches
   std::vector<std::vector<float>> feat1;  
