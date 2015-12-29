@@ -1,10 +1,76 @@
 #include <kinfu.hpp>
+#include <fragments/io.h>
+
 inline bool exists (const std::string& name) {
   struct stat buffer;   
   return (stat (name.c_str(), &buffer) == 0); 
 }
 
+// New format:
+// 3 ints (X,Y,Z volume size), followed by float array of TSDF
+void convert_tsdf_old_to_new(const std::string &src, const std::string &dst) {
+  
+  // Read TSDF from old format
+  float *tsdf = new float[512 * 512 * 1024];
+  checkout_tsdf(src, tsdf, 0, 512 - 1, 0, 512 - 1, 0, 1024 - 1);
+  
+  // Find dimensions of TSDF volume
+  int x_min = 511, x_max = 0, y_min = 511, y_max = 0, z_min = 1023, z_max = 0; // inclusive bounds
+  for (int z = 0; z < 1024; z++)
+    for (int y = 0; y < 512; y++)
+      for (int x = 0; x < 512; x++) {
+        int i = z*512*512 + y*512 + x;
+        if (tsdf[i] < 1) {
+          x_max = std::max(x, x_max);
+          y_max = std::max(y, y_max);
+          z_max = std::max(z, z_max);
+        }
+      }
+  for (int z = 1023; z >= 0; z--)
+    for (int y = 511; y >= 0; y--)
+      for (int x = 511; x >= 0; x--) {
+        int i = z*512*512 + y*512 + x;
+        if (tsdf[i] < 1) {
+          x_min = std::min(x, x_min);
+          y_min = std::min(y, y_min);
+          z_min = std::min(z, z_min);
+        }
+      }
+  int x_dim = x_max - x_min + 1;
+  int y_dim = y_max - y_min + 1;
+  int z_dim = z_max - z_min + 1;
+
+  // // Debug
+  // std::cout << x_min << std::endl;
+  // std::cout << x_max << std::endl;
+  // std::cout << y_min << std::endl;
+  // std::cout << y_max << std::endl;
+  // std::cout << z_min << std::endl;
+  // std::cout << z_max << std::endl;
+
+  // Create new smaller TSDF volume
+  float *new_tsdf = new float[x_dim * y_dim * z_dim];
+  for (int z = 0; z < z_dim; z++)
+    for (int y = 0; y < y_dim; y++)
+      for (int x = 0; x < x_dim; x++)
+        new_tsdf[z*y_dim*x_dim + y*x_dim + x] = tsdf[(z+z_min)*512*512 + (y+y_min)*512 + (x+x_min)];
+
+  write_fragment_tsdf(dst, new_tsdf, x_dim, y_dim, z_dim); // function found in fragments/io.h
+
+  delete [] tsdf;
+  delete [] new_tsdf;
+
+}
+
 int main(int argc, char **argv) {
+
+
+
+  // // CODE TO CONVERT OLD TSDF FORMAT TO NEW TSDF FORMAT
+  // convert_tsdf_old_to_new("/data/andyz/kinfu/sun3d/mit_76_studyroom/76-1studyroom2/scene960_1010", "fragments/test_new.tsdf");
+
+  // // CODE TO READ NEW TSDF FORMAT AND MAKE POINT CLOUD
+  // demo_read_fragment_tsdf("fragments/test_new.tsdf");
 
 
   // CHANGE THESE IF YOU NEED TO
@@ -68,8 +134,6 @@ int main(int argc, char **argv) {
   // CHANGE THESE IF YOU NEED TO
   std::string scene1_dir = "/data/andyz/kinfu/sun3d/"+ sequence_name + "/scene" + std::to_string(fuse_frame_start_idx_i) + "_" + std::to_string(fuse_frame_start_idx_i + num_frames_per_frag);
   std::string scene2_dir = "/data/andyz/kinfu/sun3d/"+ sequence_name + "/scene" + std::to_string(fuse_frame_start_idx_j) + "_" + std::to_string(fuse_frame_start_idx_j + num_frames_per_frag);
-
-
 
 
 
